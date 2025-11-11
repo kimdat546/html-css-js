@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Environment files
+.env
+.env.local
+
+# Browser profile (will be created in container)
+browser_profile/
+
+# Results and reports (will be generated)
+*.json
+report_*.html
+all_results.json
+chotot_results.json
+facebook_results.json
+
+# Logs
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation (not needed in container)
+*.md
+!README.md
+
+# Test files
+test_*.py
+
+# Scripts (not needed in container)
+quick_start.sh

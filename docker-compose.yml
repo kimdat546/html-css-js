@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  laptop-monitor:
+    build: .
+    container_name: laptop-theft-monitor
+    restart: unless-stopped
+
+    # Environment variables (override with .env file)
+    environment:
+      # Laptop Information
+      - LAPTOP_MODEL=${LAPTOP_MODEL:-Lenovo Thinkpad T14 GEN 3}
+      - LAPTOP_FULL_MODEL=${LAPTOP_FULL_MODEL:-21AH00JJVA}
+      - LAPTOP_SERIAL=${LAPTOP_SERIAL:-PF3YR90J}
+      - LAPTOP_OS=${LAPTOP_OS:-Windows}
+
+      # Search Configuration
+      - SEARCH_KEYWORDS=${SEARCH_KEYWORDS:-Thinkpad T14,T14 Gen 3,T14 GEN 3,21AH00JJVA,Lenovo T14,Thinkpad T14 Gen 3}
+      - TARGET_LOCATIONS=${TARGET_LOCATIONS:-Gia Lai,Kontum,Dak Lak,Daklak,Pleiku,Buon Ma Thuot,Kon Tum}
+      - FACEBOOK_GROUPS=${FACEBOOK_GROUPS:-}
+
+      # Monitoring Settings
+      - CHECK_INTERVAL_HOURS=${CHECK_INTERVAL_HOURS:-2}
+      - MAX_RESULTS_PER_SEARCH=${MAX_RESULTS_PER_SEARCH:-50}
+      - HEADLESS_BROWSER=${HEADLESS_BROWSER:-true}
+      - BROWSER_PROFILE_PATH=/app/browser_profile
+
+      # Notifications
+      - NOTIFY_CONSOLE=${NOTIFY_CONSOLE:-true}
+      - NOTIFY_EMAIL=${NOTIFY_EMAIL:-false}
+      - NOTIFY_TELEGRAM=${NOTIFY_TELEGRAM:-false}
+
+      # Email Settings (optional)
+      - EMAIL_SMTP_SERVER=${EMAIL_SMTP_SERVER:-smtp.gmail.com}
+      - EMAIL_SMTP_PORT=${EMAIL_SMTP_PORT:-587}
+      - EMAIL_SENDER=${EMAIL_SENDER:-}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-}
+      - EMAIL_RECIPIENT=${EMAIL_RECIPIENT:-}
+
+      # Telegram Settings (optional)
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+
+    # Volumes for data persistence
+    volumes:
+      - browser_data:/app/browser_profile
+      - results_data:/app/data
+      - ./:/app:ro  # Read-only mount of source code for development
+
+    # Security options
+    security_opt:
+      - seccomp:unconfined  # Required for Chrome/Chromium
+
+    # Shared memory size (required for Chrome)
+    shm_size: '2gb'
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  browser_data:
+    driver: local
+  results_data:
+    driver: local
