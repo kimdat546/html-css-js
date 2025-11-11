@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Chat ID Finder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+
+        .instructions h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+            font-family: monospace;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            display: none;
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result.success {
+            background: #d4edda;
+            border: 2px solid #28a745;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border: 2px solid #dc3545;
+        }
+
+        .result h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .result.success h3 {
+            color: #155724;
+        }
+
+        .result.error h3 {
+            color: #721c24;
+        }
+
+        .credential-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 13px;
+            line-height: 1.8;
+            color: #333;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            width: auto;
+            padding: 8px 20px;
+            font-size: 14px;
+            background: #28a745;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: #856404;
+            font-size: 13px;
+        }
+
+        .warning strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Telegram Chat ID Finder</h1>
+        <p class="subtitle">Find your Telegram Chat ID easily</p>
+
+        <div class="warning">
+            <strong>🔒 Privacy Notice:</strong>
+            This tool runs entirely in your browser. Your bot token is never sent to any server except Telegram's official API.
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li>Open Telegram and find <strong>@BotFather</strong></li>
+                <li>Send <code>/newbot</code> and create your bot</li>
+                <li>Copy the <strong>bot token</strong> BotFather gives you</li>
+                <li>Send any message to <strong>your new bot</strong></li>
+                <li>Paste the token below and click "Get Chat ID"</li>
+            </ol>
+        </div>
+
+        <div class="input-group">
+            <label for="botToken">🤖 Bot Token (from @BotFather):</label>
+            <input
+                type="text"
+                id="botToken"
+                placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+                autocomplete="off"
+            >
+        </div>
+
+        <button id="getIdBtn" onclick="getChatId()">Get Chat ID</button>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Fetching your Chat ID...</p>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        async function getChatId() {
+            const botToken = document.getElementById('botToken').value.trim();
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            const btn = document.getElementById('getIdBtn');
+
+            // Reset
+            resultDiv.style.display = 'none';
+            resultDiv.className = 'result';
+
+            // Validate
+            if (!botToken) {
+                showError('Please enter your bot token!');
+                return;
+            }
+
+            if (!botToken.includes(':')) {
+                showError('Invalid bot token format. It should contain a colon (:)');
+                return;
+            }
+
+            // Show loading
+            loadingDiv.style.display = 'block';
+            btn.disabled = true;
+
+            try {
+                const url = `https://api.telegram.org/bot${botToken}/getUpdates`;
+                const response = await fetch(url);
+                const data = await response.json();
+
+                // Hide loading
+                loadingDiv.style.display = 'none';
+                btn.disabled = false;
+
+                if (!data.ok) {
+                    showError('Invalid bot token or API error. Please check your token and try again.');
+                    return;
+                }
+
+                if (!data.result || data.result.length === 0) {
+                    showError('No messages found! Please send a message to your bot first, then try again.');
+                    return;
+                }
+
+                // Get the latest message
+                const lastMessage = data.result[data.result.length - 1];
+                const chatId = lastMessage.message.chat.id;
+                const firstName = lastMessage.message.chat.first_name || 'Unknown';
+                const username = lastMessage.message.chat.username || 'N/A';
+
+                showSuccess(botToken, chatId, firstName, username);
+
+            } catch (error) {
+                loadingDiv.style.display = 'none';
+                btn.disabled = false;
+                showError(`Error: ${error.message}. Make sure you have internet connection.`);
+            }
+        }
+
+        function showSuccess(botToken, chatId, firstName, username) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result success';
+            resultDiv.innerHTML = `
+                <h3>✅ Success!</h3>
+                <p><strong>Name:</strong> ${firstName}</p>
+                <p><strong>Username:</strong> @${username}</p>
+                <p><strong>Chat ID:</strong> <code>${chatId}</code></p>
+
+                <div class="credential-box">
+                    <strong>📋 Add these to Coolify:</strong><br><br>
+                    TELEGRAM_BOT_TOKEN=${botToken}<br>
+                    TELEGRAM_CHAT_ID=${chatId}<br>
+                    NOTIFY_TELEGRAM=true
+                </div>
+
+                <button class="copy-btn" onclick="copyCredentials('${botToken}', '${chatId}')">
+                    📋 Copy All Credentials
+                </button>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.className = 'result error';
+            resultDiv.innerHTML = `
+                <h3>❌ Error</h3>
+                <p>${message}</p>
+            `;
+            resultDiv.style.display = 'block';
+        }
+
+        function copyCredentials(botToken, chatId) {
+            const text = `TELEGRAM_BOT_TOKEN=${botToken}\nTELEGRAM_CHAT_ID=${chatId}\nNOTIFY_TELEGRAM=true`;
+
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('✅ Credentials copied to clipboard!');
+                }).catch(() => {
+                    fallbackCopy(text);
+                });
+            } else {
+                fallbackCopy(text);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('✅ Credentials copied!');
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('botToken').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getChatId();
+            }
+        });
+    </script>
+</body>
+</html>
